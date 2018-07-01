@@ -2,13 +2,18 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from core.models import Echo
-from core.serializers import EchoSerializer
+from core.serializers import EchoSerializer, UserSerializer
+from django.contrib.auth.models import User
+from rest_framework import generics
+from rest_framework import permissions
 
 
 class EchoList(APIView):
     """
     List all echos, or create a new echo.
     """
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     def get(self, request, format=None):
         echos = Echo.objects.all()
         serializer = EchoSerializer(echos, many=True)
@@ -21,11 +26,16 @@ class EchoList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
+
 
 class EchoDetail(APIView):
     """
     Retrieve, update or delete an echo.
     """
+    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
+
     def get_object(self, pk):
         try:
             return Echo.objects.get(pk=pk)
@@ -49,3 +59,13 @@ class EchoDetail(APIView):
         echo = self.get_object(pk)
         echo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
