@@ -5,14 +5,12 @@ from core.models import Echo
 from core.serializers import EchoSerializer, UserSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
-from rest_framework import permissions
 
 
 class EchoList(APIView):
     """
     List all echos, or create a new echo.
     """
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get(self, request, format=None):
         echos = Echo.objects.all()
@@ -34,7 +32,6 @@ class EchoDetail(APIView):
     """
     Retrieve, update or delete an echo.
     """
-    permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def get_object(self, pk):
         try:
