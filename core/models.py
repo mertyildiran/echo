@@ -2,11 +2,25 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+import os.path
+import uuid
+
+def echo_directory(instance, filename):
+    path = "uploads/echo/"
+    name, extension = os.path.splitext(filename)
+    format = str(instance.owner.id) + '_' + str(uuid.uuid4()) + extension
+    return os.path.join(path, format)
+
+def profile_directory(instance, filename):
+    path = "uploads/profile/"
+    name, extension = os.path.splitext(filename)
+    format = str(instance.user.id) + extension
+    return os.path.join(path, format)
 
 class Echo(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User', related_name='echos', on_delete=models.CASCADE)
-    audio = models.FileField(null=False, blank=False)
+    audio = models.FileField(null=False, blank=False, upload_to=echo_directory)
     latitude = models.IntegerField()
     longitude = models.IntegerField()
     hearts = models.IntegerField(default=0)
@@ -19,7 +33,7 @@ class Echo(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True)
-    picture = models.FileField(null=True, blank=True)
+    picture = models.FileField(null=True, blank=True, upload_to=profile_directory)
     location = models.CharField(max_length=30, blank=True)
     birth_date = models.DateField(null=True)
     GENDER_CHOICES = (
