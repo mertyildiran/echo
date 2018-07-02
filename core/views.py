@@ -13,7 +13,14 @@ class EchoList(APIView):
     """
 
     def get(self, request, format=None):
-        echos = Echo.objects.all()
+        upper_lat = self.request.query_params.get('upper_lat', None)
+        lower_lat = self.request.query_params.get('lower_lat', None)
+        upper_long = self.request.query_params.get('upper_long', None)
+        lower_long = self.request.query_params.get('lower_lat', None)
+        if all([upper_lat, lower_lat, upper_long, lower_long]):
+            echos = Echo.objects.filter(latitude__range=(lower_lat, upper_lat), longitude__range=(lower_long, upper_long), is_active=True).order_by('created_at')
+        else:
+            echos = Echo.objects.filter(is_active=True).order_by('created_at')
         serializer = EchoSerializer(echos, many=True)
         return Response(serializer.data)
 
