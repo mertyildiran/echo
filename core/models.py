@@ -21,9 +21,9 @@ class Echo(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User', related_name='echos', on_delete=models.CASCADE)
     audio = models.FileField(null=False, blank=False, upload_to=echo_directory)
-    latitude = models.IntegerField()
-    longitude = models.IntegerField()
-    hearts = models.IntegerField(default=0)
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    hearts = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
     class Meta:
