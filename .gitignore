@@ -90,3 +90,6 @@ db.sqlite3
 
 # Directory that stores media files
 media/
+
+# Celery related files
+celerybeat*
