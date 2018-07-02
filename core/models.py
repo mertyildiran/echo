@@ -18,6 +18,7 @@ class Echo(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True)
+    picture = models.FileField(null=True, blank=True)
     location = models.CharField(max_length=30, blank=True)
     birth_date = models.DateField(null=True)
     GENDER_CHOICES = (
