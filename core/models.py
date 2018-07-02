@@ -6,6 +6,7 @@ from django.dispatch import receiver
 class Echo(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User', related_name='echos', on_delete=models.CASCADE)
+    audio = models.FileField(null=False, blank=False)
     latitude = models.IntegerField()
     longitude = models.IntegerField()
     hearts = models.IntegerField(default=0)
