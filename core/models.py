@@ -16,10 +16,10 @@ class Echo(models.Model):
 
 
 class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     bio = models.TextField(max_length=500, blank=True)
     location = models.CharField(max_length=30, blank=True)
-    birth_date = models.DateField()
+    birth_date = models.DateField(null=True)
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import Echo
+from core.models import Echo, Profile
 from django.contrib.auth.models import User
 
 class EchoSerializer(serializers.ModelSerializer):
@@ -8,9 +8,28 @@ class EchoSerializer(serializers.ModelSerializer):
         owner = serializers.ReadOnlyField(source='owner.username')
         fields = ('id', 'created_at', 'owner', 'latitude', 'longitude', 'hearts', 'is_active')
 
+
 class UserSerializer(serializers.ModelSerializer):
     echos = serializers.PrimaryKeyRelatedField(many=True, queryset=Echo.objects.all())
+    birth_date = serializers.DateField(source="profile.birth_date")
+    gender = serializers.CharField(source="profile.gender")
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'echos')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'groups', 'user_permissions', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined', 'birth_date', 'gender', 'echos')
+
+    def create(self, validated_data):
+        profile_data = validated_data.pop('profile', None)
+        user = super(UserSerializer, self).create(validated_data)
+        self.update_or_create_profile(user, profile_data)
+        return user
+
+    def update(self, instance, validated_data):
+        profile_data = validated_data.pop('profile', None)
+        self.update_or_create_profile(instance, profile_data)
+        return super(UserSerializer, self).update(instance, validated_data)
+
+    def update_or_create_profile(self, user, profile_data):
+        # This always creates a Profile if the User is missing one;
+        # change the logic here if that's not right for your app
+        Profile.objects.update_or_create(user=user, defaults=profile_data)
