@@ -33,7 +33,7 @@ def garbage_collector():
                 os.remove(echo.audio.path)
             except OSError:
                 pass
-        #echo.is_active = False
-        #echo.save(update_fields=["is_active"])
+        echo.is_active = False
+        echo.save(update_fields=["is_active"])
 
     return True
