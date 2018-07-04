@@ -41,6 +41,13 @@ class Profile(models.Model):
         ('F', 'Female'),
     )
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    SEXUAL_CHOICES = (
+        ('A', 'Heterosexual'),
+        ('B', 'Bisexual'),
+        ('C', 'Homosexual'),
+        ('D', 'Sapiosexual')
+    )
+    sexual_pref = models.CharField(max_length=1, choices=SEXUAL_CHOICES)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
