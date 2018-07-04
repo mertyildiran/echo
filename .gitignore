@@ -93,3 +93,6 @@ media/
 
 # Celery related files
 celerybeat*
+
+# Redis related files
+dump.rdb
