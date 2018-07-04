@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     echos = serializers.PrimaryKeyRelatedField(many=True, queryset=Echo.objects.all())
     bio = serializers.CharField(source="profile.bio")
     picture = serializers.FileField(source="profile.picture")
-    location = serializers.CharField(source="profile.picture")
+    address = serializers.CharField(source="profile.picture")
     birth_date = serializers.DateField(source="profile.birth_date")
     gender = serializers.CharField(source="profile.gender")
     sexual_pref = serializers.CharField(source="profile.sexual_pref")
@@ -26,7 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'first_name', 'last_name', 'email', 'groups',
                     'user_permissions', 'is_staff', 'is_active', 'is_superuser',
                     'last_login', 'date_joined', 'picture', 'birth_date', 'gender',
-                    'echos', 'sexual_pref', 'location', 'bio', 'instagram',
+                    'echos', 'sexual_pref', 'address', 'bio', 'instagram',
                     'twitter', 'snapchat')
 
     def create(self, validated_data):
