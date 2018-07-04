@@ -13,6 +13,8 @@ app = Celery('echo')
 app.config_from_object('django.conf:settings')
 app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
+LIFE_SPAN = getattr(settings, "LIFE_SPAN", 5)
+
 import django
 django.setup()
 from core.models import Echo
@@ -23,7 +25,7 @@ def setup_periodic_tasks(sender, **kwargs):
 
 @app.task
 def garbage_collector():
-    time_ago = datetime.datetime.now() - datetime.timedelta(minutes=5)
+    time_ago = datetime.datetime.now() - datetime.timedelta(minutes=LIFE_SPAN)
 
     echos = Echo.objects.filter(created_at__lte=time_ago, is_active=True).order_by('created_at')
     for echo in echos:
