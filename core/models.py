@@ -48,6 +48,9 @@ class Profile(models.Model):
         ('D', 'Sapiosexual')
     )
     sexual_pref = models.CharField(max_length=1, choices=SEXUAL_CHOICES)
+    instagram = models.CharField(max_length=30, blank=True)
+    twitter = models.CharField(max_length=30, blank=True)
+    snapchat = models.CharField(max_length=30, blank=True)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

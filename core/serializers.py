@@ -11,12 +11,15 @@ class EchoSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     echos = serializers.PrimaryKeyRelatedField(many=True, queryset=Echo.objects.all())
-    bio = serializers.TextField(source="profile.bio")
+    bio = serializers.CharField(source="profile.bio")
     picture = serializers.FileField(source="profile.picture")
     location = serializers.CharField(source="profile.picture")
     birth_date = serializers.DateField(source="profile.birth_date")
     gender = serializers.CharField(source="profile.gender")
     sexual_pref = serializers.CharField(source="profile.sexual_pref")
+    instagram = serializers.CharField(source="profile.instagram")
+    twitter = serializers.CharField(source="profile.twitter")
+    snapchat = serializers.CharField(source="profile.snapchat")
 
     class Meta:
         model = User
