@@ -18,8 +18,16 @@ class EchoList(APIView):
         upper_long = self.request.query_params.get('upper_long', None)
         lower_long = self.request.query_params.get('lower_lat', None)
         only_active = self.request.query_params.get('only_active', None)
-        if all([upper_lat, lower_lat, upper_long, lower_long]):
-            echos = Echo.objects.filter(latitude__range=(lower_lat, upper_lat), longitude__range=(lower_long, upper_long), is_active=True).order_by('created_at')
+        gender = self.request.query_params.get('gender', None)
+        sexual_pref = self.request.query_params.get('sexual_pref', None)
+        target_gender, target_sexual_pref = analyze_sexual_pref(gender, sexual_pref)
+        target_gender, target_sexual_pref = shorten(target_gender, target_sexual_pref)
+        if all([upper_lat, lower_lat, upper_long, lower_long, gender, sexual_pref]):
+            echos = Echo.objects.filter(latitude__range=(lower_lat, upper_lat),
+                                        longitude__range=(lower_long, upper_long),
+                                        owner__profile__gender__in=target_gender,
+                                        owner__profile__sexual_pref__in=target_sexual_pref,
+                                        is_active=True).order_by('created_at')
         elif only_active:
             echos = Echo.objects.filter(is_active=True).order_by('created_at')
         else:
@@ -114,3 +122,39 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+def analyze_sexual_pref(gender, sexual_pref):
+    if sexual_pref == 'Heterosexual':
+        if gender == 'Male':
+            return ['Female'], ['Heterosexual', 'Bisexual']
+        elif gender == 'Female':
+            return ['Male'], ['Heterosexual', 'Bisexual']
+    elif sexual_pref == "Bisexual":
+        return ['Male', 'Female'], ['Heterosexual', 'Bisexual', 'Homosexual']
+    elif sexual_pref == 'Homosexual':
+        if gender == 'Male':
+            return ['Male'], ['Homosexual', 'Bisexual']
+        elif gender == 'Female':
+            return ['Female'], ['Homosexual', 'Bisexual']
+    elif sexual_pref == 'Sapiosexual':
+        if gender == 'Male':
+            return ['Female'], ['Sapiosexual']
+        elif gender == 'Female':
+            return ['Male'], ['Sapiosexual']
+    return ['Female'], ['Heterosexual', 'Bisexual']
+
+def shorten(target_gender, target_sexual_pref):
+    GENDER_CHOICES = {
+        'M': 'Male',
+        'F': 'Female'
+    }
+    SEXUAL_CHOICES = {
+        'A': 'Heterosexual',
+        'B': 'Bisexual',
+        'C': 'Homosexual',
+        'D': 'Sapiosexual'
+    }
+    target_gender = [k for k, v in GENDER_CHOICES.items() if v in target_gender]
+    target_sexual_pref = [k for k, v in SEXUAL_CHOICES.items() if v in target_sexual_pref]
+    return target_gender, target_sexual_pref

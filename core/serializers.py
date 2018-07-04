@@ -23,7 +23,11 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'groups', 'user_permissions', 'is_staff', 'is_active', 'is_superuser', 'last_login', 'date_joined', 'picture', 'birth_date', 'gender', 'echos', 'sexual_pref', 'location', 'bio')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'groups',
+                    'user_permissions', 'is_staff', 'is_active', 'is_superuser',
+                    'last_login', 'date_joined', 'picture', 'birth_date', 'gender',
+                    'echos', 'sexual_pref', 'location', 'bio', 'instagram',
+                    'twitter', 'snapchat')
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile', None)
