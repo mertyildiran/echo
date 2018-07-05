@@ -5,6 +5,9 @@ from core.models import Echo
 from core.serializers import EchoSerializer, UserSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
+from django.contrib.gis.geos import Point
+from django.contrib.gis.db.models.functions import Distance
+from django.contrib.gis.measure import D
 
 
 class EchoList(APIView):
@@ -13,21 +16,23 @@ class EchoList(APIView):
     """
 
     def get(self, request, format=None):
-        upper_lat = self.request.query_params.get('upper_lat', None)
-        lower_lat = self.request.query_params.get('lower_lat', None)
-        upper_long = self.request.query_params.get('upper_long', None)
-        lower_long = self.request.query_params.get('lower_lat', None)
+        latitude = self.request.query_params.get('latitude', None)
+        longitude = self.request.query_params.get('longitude', None)
+        distance = self.request.query_params.get('distance', None)
         only_active = self.request.query_params.get('only_active', None)
         gender = self.request.query_params.get('gender', None)
         sexual_pref = self.request.query_params.get('sexual_pref', None)
+        if distance:
+            distance = int(distance)*1000  # km to meters
+        if latitude and longitude:
+            ref_location = Point(float(latitude), float(longitude))
         target_gender, target_sexual_pref = analyze_sexual_pref(gender, sexual_pref)
         target_gender, target_sexual_pref = shorten(target_gender, target_sexual_pref)
-        if all([upper_lat, lower_lat, upper_long, lower_long, gender, sexual_pref]):
-            echos = Echo.objects.filter(latitude__range=(lower_lat, upper_lat),
-                                        longitude__range=(lower_long, upper_long),
+        if all([latitude, longitude, distance, gender, sexual_pref]):
+            echos = Echo.objects.filter(location__distance_lte=(ref_location, D(m=distance)),
                                         owner__profile__gender__in=target_gender,
                                         owner__profile__sexual_pref__in=target_sexual_pref,
-                                        is_active=True).order_by('created_at')
+                                        is_active=True).annotate(distance=Distance('location', ref_location)).order_by('distance')
         elif only_active:
             echos = Echo.objects.filter(is_active=True).order_by('created_at')
         else:
