@@ -33,9 +33,9 @@ def garbage_collector():
             print(echo.audio.path)
             try:
                 os.remove(echo.audio.path)
+                echo.is_active = False
+                echo.save(update_fields=["is_active"])
             except OSError:
                 pass
-        echo.is_active = False
-        echo.save(update_fields=["is_active"])
 
     return True
