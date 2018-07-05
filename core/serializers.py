@@ -6,7 +6,7 @@ class EchoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Echo
         owner = serializers.ReadOnlyField(source='owner.username')
-        fields = ('id', 'created_at', 'owner', 'audio', 'latitude', 'longitude', 'hearts', 'is_active')
+        fields = ('id', 'created_at', 'owner', 'audio', 'location', 'hearts', 'is_active')
 
 
 class UserSerializer(serializers.ModelSerializer):

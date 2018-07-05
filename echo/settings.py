@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'core.apps.CoreConfig',
-    'rest_framework.authtoken'
+    'rest_framework.authtoken',
+    'rest_framework_gis'
 ]
 
 MIDDLEWARE = [
@@ -78,7 +79,7 @@ WSGI_APPLICATION = 'echo.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
+        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
@@ -147,3 +148,5 @@ CELERY_TIMEZONE = 'Europe/Istanbul'
 
 # Life span of an echo in minutes
 LIFE_SPAN = 5
+
+SPATIALITE_LIBRARY_PATH='/usr/local/lib/mod_spatialite.dylib'

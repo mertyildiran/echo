@@ -4,6 +4,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 import os.path
 import uuid
+from django.contrib.gis.db import models as geo_models
 
 def echo_directory(instance, filename):
     path = "uploads/echo/"
@@ -21,8 +22,7 @@ class Echo(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey('auth.User', related_name='echos', on_delete=models.CASCADE)
     audio = models.FileField(null=False, blank=False, upload_to=echo_directory)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    location = geo_models.PointField(null=False, blank=False, srid=4326, verbose_name="Location")
     hearts = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
