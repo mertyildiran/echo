@@ -3,7 +3,7 @@
 the RESTful API of echo: voice-focused dating app, written on top of Django REST framework
 
 <p align="center">
-  <img src="https://i.imgur.com/2BDjKrY.png" alt="App icon" height="300px"/>
+  <img src="https://i.imgur.com/BXRSW6g.png" alt="App icon" height="300px"/>
 </p>
 
 ### Installation
