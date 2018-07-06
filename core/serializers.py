@@ -13,7 +13,7 @@ class UserSerializer(serializers.ModelSerializer):
     echos = serializers.PrimaryKeyRelatedField(many=True, queryset=Echo.objects.all())
     bio = serializers.CharField(source="profile.bio")
     picture = serializers.FileField(source="profile.picture")
-    address = serializers.CharField(source="profile.picture")
+    address = serializers.CharField(source="profile.address")
     birth_date = serializers.DateField(source="profile.birth_date")
     gender = serializers.CharField(source="profile.gender")
     sexual_pref = serializers.CharField(source="profile.sexual_pref")
