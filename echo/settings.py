@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
 import os
+import platform
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -149,4 +150,8 @@ CELERY_TIMEZONE = 'Europe/Istanbul'
 # Life span of an echo in minutes
 LIFE_SPAN = 5
 
-SPATIALITE_LIBRARY_PATH='/usr/local/lib/mod_spatialite.dylib'
+PLATFORM_SYSTEM = platform.system()
+if PLATFORM_SYSTEM == "Darwin":
+    SPATIALITE_LIBRARY_PATH = '/usr/local/lib/mod_spatialite.dylib'
+elif PLATFORM_SYSTEM == "Linux":
+    SPATIALITE_LIBRARY_PATH = 'mod_spatialite'

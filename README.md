@@ -19,5 +19,6 @@ pip3 install -r requirements.txt
 This script will start a Redis Server, the Django RESTful API and Celery Periodic Tasks:
 
 ```Shell
+python3 manage.py migrate
 ./run.sh
 ```
