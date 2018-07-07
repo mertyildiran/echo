@@ -8,5 +8,6 @@ urlpatterns = [
     url(r'^echos/(?P<pk>[0-9]+)/$', views.EchoDetail.as_view()),
     url(r'^users/$', views.UserList.as_view()),
     url(r'^users/(?P<pk>[0-9]+)/$', views.UserDetail.as_view()),
+    url(r'^register/$', views.Register.as_view()),
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)

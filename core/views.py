@@ -8,6 +8,7 @@ from rest_framework import generics
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
+from rest_framework.permissions import AllowAny
 
 
 class EchoList(APIView):
@@ -83,13 +84,21 @@ class EchoDetail(APIView):
 
 class UserList(APIView):
     """
-    List all users, or create a new user.
+    List all users.
     """
 
     def get(self, request, format=None):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
+
+
+class Register(APIView):
+    """
+    Create a new user.
+    """
+
+    permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
         serializer = UserSerializer(data=request.data)
