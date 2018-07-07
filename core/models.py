@@ -32,24 +32,25 @@ class Echo(models.Model):
 
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
-    bio = models.TextField(max_length=500, blank=True)
-    picture = models.FileField(null=True, blank=True, upload_to=profile_directory)
-    birth_date = models.DateField(null=True)
+    picture = models.FileField(null=False, blank=False, upload_to=profile_directory)
+    birth_date = models.DateField(null=False, blank=False, default="2018-01-01")
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
     )
-    gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
+    gender = models.CharField(max_length=1, null=False, blank=False, choices=GENDER_CHOICES)
     SEXUAL_CHOICES = (
         ('A', 'Heterosexual'),
         ('B', 'Bisexual'),
         ('C', 'Homosexual'),
         ('D', 'Sapiosexual')
     )
-    sexual_pref = models.CharField(max_length=1, choices=SEXUAL_CHOICES)
-    instagram = models.CharField(max_length=30, blank=True)
-    twitter = models.CharField(max_length=30, blank=True)
-    snapchat = models.CharField(max_length=30, blank=True)
+    sexual_pref = models.CharField(max_length=1, null=False, blank=False, choices=SEXUAL_CHOICES)
+
+    bio = models.TextField(max_length=500, null=True, blank=True)
+    instagram = models.CharField(max_length=30, null=True, blank=True)
+    twitter = models.CharField(max_length=30, null=True, blank=True)
+    snapchat = models.CharField(max_length=30, null=True, blank=True)
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
