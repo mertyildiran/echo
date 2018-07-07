@@ -11,6 +11,7 @@ class EchoSerializer(serializers.ModelSerializer):
 
 class UserSerializer(serializers.ModelSerializer):
     echos = serializers.PrimaryKeyRelatedField(many=True, queryset=Echo.objects.all())
+    first_name = serializers.CharField()
     picture = serializers.FileField(source="profile.picture")
     birth_date = serializers.DateField(source="profile.birth_date")
     gender = serializers.CharField(source="profile.gender")
