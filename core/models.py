@@ -5,6 +5,7 @@ from django.dispatch import receiver
 import os.path
 import uuid
 from django.contrib.gis.db import models as geo_models
+from rest_framework.authtoken.models import Token as DRF_Token
 
 def echo_directory(instance, filename):
     path = "uploads/echo/"
@@ -51,6 +52,15 @@ class Profile(models.Model):
     instagram = models.CharField(max_length=30, null=True, blank=True)
     twitter = models.CharField(max_length=30, null=True, blank=True)
     snapchat = models.CharField(max_length=30, null=True, blank=True)
+
+
+class Token(models.Model):
+    user = models.OneToOneField(User, related_name='token', on_delete=models.CASCADE)
+    key = models.CharField(max_length=46, null=True, blank=True)
+
+    def save(self, **kwargs):
+        self.key = "Token " + DRF_Token.objects.create(user=User.objects.get(pk=self.user.id)).key
+        super(Token, self).save()
 
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):

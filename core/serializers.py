@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from core.models import Echo, Profile
+from core.models import Echo, Profile, Token
 from django.contrib.auth.models import User
 
 class EchoSerializer(serializers.ModelSerializer):
@@ -22,17 +22,22 @@ class UserSerializer(serializers.ModelSerializer):
     twitter = serializers.CharField(source="profile.twitter", required=False)
     snapchat = serializers.CharField(source="profile.snapchat", required=False)
 
+    key = serializers.CharField(source="token.key", required=False, read_only=True)
+
     class Meta:
         model = User
         fields = ('id', 'username', 'first_name', 'last_name', 'email', 'groups',
                     'user_permissions', 'is_staff', 'is_active', 'is_superuser',
                     'last_login', 'date_joined', 'picture', 'birth_date', 'gender',
-                    'echos', 'sexual_pref', 'bio', 'instagram', 'twitter', 'snapchat')
+                    'echos', 'sexual_pref', 'bio', 'instagram', 'twitter',
+                    'snapchat', 'key')
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile', None)
+        token_data = validated_data.pop('token', None)
         user = super(UserSerializer, self).create(validated_data)
         self.update_or_create_profile(user, profile_data)
+        self.get_or_create_token(user, token_data)
         return user
 
     def update(self, instance, validated_data):
@@ -44,3 +49,8 @@ class UserSerializer(serializers.ModelSerializer):
         # This always creates a Profile if the User is missing one;
         # change the logic here if that's not right for your app
         Profile.objects.update_or_create(user=user, defaults=profile_data)
+
+    def get_or_create_token(self, user, token_data):
+        # This always creates a Profile if the User is missing one;
+        # change the logic here if that's not right for your app
+        Token.objects.get_or_create(user=user, defaults=token_data)
