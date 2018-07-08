@@ -49,7 +49,7 @@ class EchoList(APIView):
     def post(self, request, format=None):
         try:
             if not User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id == self.request.POST.get('owner', None):
-                return Response("You don't have the right to send echos in the name of a different user.", status=status.HTTP_403_FORBIDDEN)
+                return Response("You cannot send echos in the name of a different user.", status=status.HTTP_403_FORBIDDEN)
         except User.DoesNotExist:
             return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
         serializer = EchoSerializer(data=request.data)
@@ -86,6 +86,14 @@ class EchoDetail(APIView):
         except Echo.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    def check_owner(self, request, echo):
+        try:
+            if not User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id == echo.owner.id:
+                return False
+        except User.DoesNotExist:
+            return False  # If there is no user with that API key then it's an unauthorized operation by default
+        return True
+
     def get(self, request, pk, format=None):
         echo = self.get_object(pk)
         serializer = EchoSerializer(echo)
@@ -93,6 +101,8 @@ class EchoDetail(APIView):
 
     def put(self, request, pk, format=None):
         echo = self.get_object(pk)
+        if not self.check_owner(request, echo):
+            return Response("You cannot update echo details that are belong to other users.", status=status.HTTP_403_FORBIDDEN)
         serializer = EchoSerializer(echo, data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -101,6 +111,8 @@ class EchoDetail(APIView):
 
     def delete(self, request, pk, format=None):
         echo = self.get_object(pk)
+        if not self.check_owner(request, echo):
+            return Response("You cannot delete echos that are belong to other users.", status=status.HTTP_403_FORBIDDEN)
         echo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -144,8 +156,8 @@ class Login(APIView):
         username = self.request.POST.get('username', None)
         email = self.request.POST.get('email', None)
         password = self.request.POST.get('password', None)
-        if not (username and email and password):
-            return Response("You have to supply username, email and password parameters.", status=status.HTTP_400_BAD_REQUEST)
+        if not all([username, email, password]):
+            return Response("You have to supply 'username', 'email' and 'password' parameters.", status=status.HTTP_400_BAD_REQUEST)
         try:
             user = User.objects.get(username=username, password=PBKDF2SHA1PasswordHasher().encode(password, SALT))
         except User.DoesNotExist:
@@ -170,12 +182,30 @@ class UserDetail(APIView):
         except User.DoesNotExist:
             return Response(status=status.HTTP_404_NOT_FOUND)
 
+    def check_owner(self, request, pk):
+        try:
+            if not User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id == pk:
+                return False
+        except User.DoesNotExist:
+            return False  # If there is no user with that API key then it's an unauthorized operation by default
+        return True
+
     def get(self, request, pk, format=None):
+        username = self.request.query_params.get('username', None)
+        if not username:
+            return Response("You have to supply 'username' parameter.", status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if not User.objects.get(username=username).id == pk:
+                return Response("It is not possible get user details by doing random shots without knowing the correct ['username', 'id'] combination.", status=status.HTTP_403_FORBIDDEN)
+        except User.DoesNotExist:
+            return Response("That 'username' doesn't even exist.", status=status.HTTP_401_UNAUTHORIZED)
         user = self.get_object(pk)
         serializer = UserSerializer(user)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
+        if not self.check_owner(request, pk):
+            return Response("You cannot update the account details of other users.", status=status.HTTP_403_FORBIDDEN)
         user = self.get_object(pk)
         serializer = UserSerializer(user, data=request.data)
         if serializer.is_valid():
@@ -184,6 +214,8 @@ class UserDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
+        if not self.check_owner(request, pk):
+            return Response("You cannot delete the accounts of other users.", status=status.HTTP_403_FORBIDDEN)
         user = self.get_object(pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
