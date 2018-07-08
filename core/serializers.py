@@ -1,6 +1,10 @@
 from rest_framework import serializers
 from core.models import Echo, Profile, Token
 from django.contrib.auth.models import User
+from django.contrib.auth.hashers import PBKDF2SHA1PasswordHasher
+from django.conf import settings
+
+SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
 class EchoSerializer(serializers.ModelSerializer):
     class Meta:
@@ -12,6 +16,8 @@ class EchoSerializer(serializers.ModelSerializer):
 class UserSerializer(serializers.ModelSerializer):
     echos = serializers.PrimaryKeyRelatedField(many=True, queryset=Echo.objects.all())
     first_name = serializers.CharField()
+    email = serializers.CharField()
+    password = serializers.CharField()
     picture = serializers.FileField(source="profile.picture")
     birth_date = serializers.DateField(source="profile.birth_date")
     gender = serializers.CharField(source="profile.gender")
@@ -26,15 +32,16 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'groups',
-                    'user_permissions', 'is_staff', 'is_active', 'is_superuser',
-                    'last_login', 'date_joined', 'picture', 'birth_date', 'gender',
-                    'echos', 'sexual_pref', 'bio', 'instagram', 'twitter',
-                    'snapchat', 'key')
+        fields = ('id', 'username', 'first_name', 'last_name', 'email', 'password',
+                    'groups', 'user_permissions', 'is_staff', 'is_active',
+                    'is_superuser', 'last_login', 'date_joined', 'picture',
+                    'birth_date', 'gender', 'echos', 'sexual_pref', 'bio',
+                    'instagram', 'twitter', 'snapchat', 'key')
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile', None)
         token_data = validated_data.pop('token', None)
+        validated_data['password'] = PBKDF2SHA1PasswordHasher().encode(validated_data['password'], SALT)
         user = super(UserSerializer, self).create(validated_data)
         self.update_or_create_profile(user, profile_data)
         self.get_or_create_token(user, token_data)

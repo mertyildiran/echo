@@ -9,6 +9,10 @@ from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
 from rest_framework.permissions import AllowAny
+from django.contrib.auth.hashers import PBKDF2SHA1PasswordHasher
+from django.conf import settings
+
+SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
 
 class EchoList(APIView):
@@ -106,6 +110,30 @@ class Register(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class Login(APIView):
+    """
+    Authenticate.
+    """
+
+    permission_classes = (AllowAny,)
+
+    def post(self, request, format=None):
+        username = self.request.POST.get('username', None)
+        email = self.request.POST.get('email', None)
+        password = self.request.POST.get('password', None)
+        try:
+            user = User.objects.get(username=username, password=PBKDF2SHA1PasswordHasher().encode(password, SALT))
+        except User.DoesNotExist:
+            try:
+                user = User.objects.get(email=email, password=PBKDF2SHA1PasswordHasher().encode(password, SALT))
+            except User.DoesNotExist:
+                return Response("Login failed wrong user credentials", status=status.HTTP_401_UNAUTHORIZED)
+        if user:
+            serializer = UserSerializer(user)
+            return Response(serializer.data)
+        return Response("Unknown internal server error", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserDetail(APIView):

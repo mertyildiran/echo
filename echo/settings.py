@@ -155,3 +155,5 @@ if PLATFORM_SYSTEM == "Darwin":
     SPATIALITE_LIBRARY_PATH = '/usr/local/lib/mod_spatialite.dylib'
 elif PLATFORM_SYSTEM == "Linux":
     SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
+
+PASSWORD_SALT = "0cdAT1bdqZ"
