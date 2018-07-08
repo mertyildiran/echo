@@ -6,12 +6,6 @@ from django.conf import settings
 
 SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
-class EchoSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Echo
-        owner = serializers.ReadOnlyField(source='owner.username')
-        fields = ('id', 'created_at', 'owner', 'audio', 'location', 'hearts', 'is_active')
-
 
 class UserSerializer(serializers.ModelSerializer):
     echos = serializers.PrimaryKeyRelatedField(many=True, queryset=Echo.objects.all())
@@ -61,3 +55,11 @@ class UserSerializer(serializers.ModelSerializer):
         # This always creates a Profile if the User is missing one;
         # change the logic here if that's not right for your app
         Token.objects.get_or_create(user=user, defaults=token_data)
+
+
+class EchoSerializer(serializers.ModelSerializer):
+    owner = UserSerializer(many=False, read_only=True)
+
+    class Meta:
+        model = Echo
+        fields = ('id', 'created_at', 'owner', 'audio', 'location', 'hearts', 'is_active')
