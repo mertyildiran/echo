@@ -8,7 +8,7 @@ from rest_framework import generics
 from django.contrib.gis.geos import Point
 from django.contrib.gis.db.models.functions import Distance
 from django.contrib.gis.measure import D
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAdminUser
 from django.contrib.auth.hashers import PBKDF2SHA1PasswordHasher
 from django.conf import settings
 
@@ -17,7 +17,7 @@ SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
 class EchoList(APIView):
     """
-    List all echos, or create a new echo.
+    List echos by filter, or create a new echo.
     """
 
     def get(self, request, format=None):
@@ -41,11 +41,17 @@ class EchoList(APIView):
         elif only_active:
             echos = Echo.objects.filter(is_active=True).order_by('created_at')
         else:
-            echos = Echo.objects.all().order_by('created_at')
+            echos = []
+
         serializer = EchoSerializer(echos, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
+        try:
+            if not User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id == self.request.POST.get('owner', None):
+                return Response("You don't have the right to send echos in the name of a different user.", status=status.HTTP_403_FORBIDDEN)
+        except User.DoesNotExist:
+            return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
         serializer = EchoSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
@@ -54,6 +60,19 @@ class EchoList(APIView):
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
+
+
+class StaffOnlyEchoList(APIView):
+    """
+    List all echos, or create a new echo.
+    """
+
+    permission_classes = (IsAdminUser,)
+
+    def get(self, request, format=None):
+        echos = Echo.objects.all().order_by('created_at')
+        serializer = EchoSerializer(echos, many=True)
+        return Response(serializer.data)
 
 
 class EchoDetail(APIView):
@@ -86,10 +105,12 @@ class EchoDetail(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class UserList(APIView):
+class StaffOnlyUserList(APIView):
     """
     List all users.
     """
+
+    permission_classes = (IsAdminUser,)
 
     def get(self, request, format=None):
         users = User.objects.all()
@@ -123,17 +144,19 @@ class Login(APIView):
         username = self.request.POST.get('username', None)
         email = self.request.POST.get('email', None)
         password = self.request.POST.get('password', None)
+        if not (username and email and password):
+            return Response("You have to supply username, email and password parameters.", status=status.HTTP_400_BAD_REQUEST)
         try:
             user = User.objects.get(username=username, password=PBKDF2SHA1PasswordHasher().encode(password, SALT))
         except User.DoesNotExist:
             try:
                 user = User.objects.get(email=email, password=PBKDF2SHA1PasswordHasher().encode(password, SALT))
             except User.DoesNotExist:
-                return Response("Login failed wrong user credentials", status=status.HTTP_401_UNAUTHORIZED)
+                return Response("Login failed because of wrong user credentials.", status=status.HTTP_401_UNAUTHORIZED)
         if user:
             serializer = UserSerializer(user)
             return Response(serializer.data)
-        return Response("Unknown internal server error", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response("Unknown internal server error.", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserDetail(APIView):

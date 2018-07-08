@@ -12,6 +12,7 @@ class UserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField()
     email = serializers.CharField()
     password = serializers.CharField()
+    is_active = serializers.BooleanField(default=True)
     picture = serializers.FileField(source="profile.picture")
     birth_date = serializers.DateField(source="profile.birth_date")
     gender = serializers.CharField(source="profile.gender")
