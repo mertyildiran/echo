@@ -1,5 +1,5 @@
 from django.contrib import admin
-from core.models import Echo, Profile, Token
+from core.models import Echo, Profile, Token, Notification
 
 
 class ProfileAdmin(admin.ModelAdmin):
@@ -13,3 +13,7 @@ admin.site.register(Token, TokenAdmin)
 class EchoAdmin(admin.ModelAdmin):
     fields = ('owner', 'audio', 'location', 'hearts', 'is_active')
 admin.site.register(Echo, EchoAdmin)
+
+class NotificationAdmin(admin.ModelAdmin):
+    fields = ('sender', 'receiver')
+admin.site.register(Notification, NotificationAdmin)
