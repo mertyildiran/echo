@@ -41,7 +41,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'core.apps.CoreConfig',
     'rest_framework.authtoken',
-    'rest_framework_gis'
+    'rest_framework_gis',
+    'django.contrib.gis'
 ]
 
 MIDDLEWARE = [
