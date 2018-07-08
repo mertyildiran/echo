@@ -34,7 +34,7 @@ class Echo(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     picture = models.FileField(null=False, blank=False, upload_to=profile_directory)
-    birth_date = models.DateField(null=False, blank=False, default="2018-01-01")
+    birth_date = models.DateField(null=False, blank=False)
     GENDER_CHOICES = (
         ('M', 'Male'),
         ('F', 'Female'),
