@@ -1,8 +1,8 @@
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from core.models import Echo
-from core.serializers import EchoSerializer, UserSerializer
+from core.models import Echo, Notification
+from core.serializers import EchoSerializer, UserSerializer, NotificationSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
 from django.contrib.gis.geos import Point
@@ -219,6 +219,31 @@ class UserDetail(APIView):
         user = self.get_object(pk)
         user.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class NotificationList(APIView):
+    """
+    Retrieve or insert notifications
+    """
+
+    def get(self, request, format=None):
+        try:
+            notifications = Notification.objects.filter(sender=User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id).order_by('-created_at')
+        except User.DoesNotExist:
+            return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
+        serializer = NotificationSerializer(notifications, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        try:
+            self.request.POST.set('sender', User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id)
+        except User.DoesNotExist:
+            return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
+        serializer = NotificationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 def analyze_sexual_pref(gender, sexual_pref):
