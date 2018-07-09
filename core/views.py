@@ -171,15 +171,15 @@ class Login(APIView):
             except User.DoesNotExist:
                 try:
                     user = User.objects.get(username=username)
-                    data['password'] = "Wrong password."
+                    data['password'] = ["Wrong password."]
                     return Response(data, status=status.HTTP_401_UNAUTHORIZED)
                 except User.DoesNotExist:
                     try:
                         user = User.objects.get(email=email)
-                        data['password'] = "Wrong password."
+                        data['password'] = ["Wrong password."]
                         return Response(data, status=status.HTTP_401_UNAUTHORIZED)
                     except User.DoesNotExist:
-                        data['username'] = "Username or email not found."
+                        data['username'] = ["Username or email not found."]
                         return Response(data, status=status.HTTP_401_UNAUTHORIZED)
         if user:
             serializer = UserSerializer(user)
