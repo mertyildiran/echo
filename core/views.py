@@ -11,6 +11,7 @@ from django.contrib.gis.measure import D
 from rest_framework.permissions import AllowAny, IsAdminUser
 from django.contrib.auth.hashers import PBKDF2SHA1PasswordHasher
 from django.conf import settings
+from rest_framework.authtoken.models import Token
 
 SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
@@ -48,7 +49,7 @@ class EchoList(APIView):
 
     def post(self, request, format=None):
         try:
-            if not User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id == self.request.POST.get('owner', None):
+            if not Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id == self.request.POST.get('owner', None):
                 return Response("You cannot send echos in the name of a different user.", status=status.HTTP_403_FORBIDDEN)
         except User.DoesNotExist:
             return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
@@ -88,7 +89,7 @@ class EchoDetail(APIView):
 
     def check_owner(self, request, echo):
         try:
-            if not User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id == echo.owner.id:
+            if not Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id == echo.owner.id:
                 return False
         except User.DoesNotExist:
             return False  # If there is no user with that API key then it's an unauthorized operation by default
@@ -184,7 +185,7 @@ class UserDetail(APIView):
 
     def check_owner(self, request, pk):
         try:
-            if not User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id == pk:
+            if not Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id == pk:
                 return False
         except User.DoesNotExist:
             return False  # If there is no user with that API key then it's an unauthorized operation by default
@@ -228,7 +229,7 @@ class NotificationList(APIView):
 
     def get(self, request, format=None):
         try:
-            notifications = Notification.objects.filter(sender=User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id).order_by('-created_at')
+            notifications = Notification.objects.filter(sender=Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id).order_by('-created_at')
         except User.DoesNotExist:
             return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
         serializer = NotificationSerializer(notifications, many=True)
@@ -236,7 +237,7 @@ class NotificationList(APIView):
 
     def post(self, request, format=None):
         try:
-            self.request.POST.set('sender', User.objects.get(token__key=self.request.META['HTTP_AUTHORIZATION']).id)
+            self.request.POST.set('sender', Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id)
         except User.DoesNotExist:
             return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
         serializer = NotificationSerializer(data=request.data)

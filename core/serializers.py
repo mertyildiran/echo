@@ -1,9 +1,10 @@
 from rest_framework import serializers
-from core.models import Echo, Profile, Token
+from core.models import Echo, Profile, Notification
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import PBKDF2SHA1PasswordHasher
 from django.conf import settings
 from rest_framework.validators import UniqueValidator
+from rest_framework.authtoken.models import Token
 
 SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
@@ -24,7 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
     twitter = serializers.CharField(source="profile.twitter", required=False)
     snapchat = serializers.CharField(source="profile.snapchat", required=False)
 
-    key = serializers.CharField(source="token.key", required=False, read_only=True)
+    key = serializers.CharField(source="auth_token.key", required=False, read_only=True)
 
     class Meta:
         model = User
@@ -36,11 +37,9 @@ class UserSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile', None)
-        token_data = validated_data.pop('token', None)
         validated_data['password'] = PBKDF2SHA1PasswordHasher().encode(validated_data['password'], SALT)
         user = super(UserSerializer, self).create(validated_data)
         self.update_or_create_profile(user, profile_data)
-        self.get_or_create_token(user, token_data)
         return user
 
     def update(self, instance, validated_data):
@@ -53,11 +52,6 @@ class UserSerializer(serializers.ModelSerializer):
         # change the logic here if that's not right for your app
         Profile.objects.update_or_create(user=user, defaults=profile_data)
 
-    def get_or_create_token(self, user, token_data):
-        # This always creates a Profile if the User is missing one;
-        # change the logic here if that's not right for your app
-        Token.objects.get_or_create(user=user, defaults=token_data)
-
 
 class EchoSerializer(serializers.ModelSerializer):
     owner = UserSerializer(many=False, read_only=True)
@@ -69,5 +63,5 @@ class EchoSerializer(serializers.ModelSerializer):
 
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Echo
+        model = Notification
         fields = ('id', 'created_at', 'sender', 'receiver')

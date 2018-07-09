@@ -5,7 +5,8 @@ from django.dispatch import receiver
 import os.path
 import uuid
 from django.contrib.gis.db import models as geo_models
-from rest_framework.authtoken.models import Token as DRF_Token
+from rest_framework.authtoken.models import Token
+from django.conf import settings
 
 
 def echo_directory(instance, filename):
@@ -56,15 +57,6 @@ class Profile(models.Model):
     snapchat = models.CharField(max_length=30, null=True, blank=True)
 
 
-class Token(models.Model):
-    user = models.OneToOneField(User, related_name='token', on_delete=models.CASCADE)
-    key = models.CharField(max_length=46, null=True, blank=True)
-
-    def save(self, **kwargs):
-        self.key = "Token " + DRF_Token.objects.create(user=User.objects.get(pk=self.user.id)).key
-        super(Token, self).save()
-
-
 class Notification(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     sender = models.ForeignKey(User, related_name='sender', on_delete=models.CASCADE)
@@ -77,6 +69,7 @@ class Notification(models.Model):
 def create_user_profile(sender, instance, created, **kwargs):
     if created:
         Profile.objects.create(user=instance)
+        Token.objects.create(user=instance)
 
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance, **kwargs):
