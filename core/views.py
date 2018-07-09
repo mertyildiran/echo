@@ -13,6 +13,7 @@ from django.contrib.auth.hashers import PBKDF2SHA1PasswordHasher
 from django.conf import settings
 from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
+from core.renderers import DistanceRenderer
 
 SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
@@ -21,6 +22,8 @@ class EchoList(APIView):
     """
     List echos by filter, or create a new echo.
     """
+
+    renderer_classes = (DistanceRenderer,)
 
     def get(self, request, format=None):
         latitude = self.request.query_params.get('latitude', None)
@@ -153,7 +156,7 @@ class Login(APIView):
     """
 
     permission_classes = (AllowAny,)
-    renderer_classes = (JSONRenderer, )
+    renderer_classes = (JSONRenderer,)
 
     def post(self, request, format=None):
         username = self.request.POST.get('username', None)

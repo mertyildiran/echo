@@ -57,10 +57,11 @@ class UserSerializer(serializers.ModelSerializer):
 
 class EchoSerializer(serializers.ModelSerializer):
     owner = UserSerializer(many=False, read_only=True)
+    distance = serializers.ReadOnlyField()
 
     class Meta:
         model = Echo
-        fields = ('id', 'created_at', 'owner', 'audio', 'location', 'hearts', 'is_active')
+        fields = ('id', 'created_at', 'owner', 'audio', 'location', 'distance', 'hearts', 'is_active')
 
 
 class NotificationSerializer(serializers.ModelSerializer):
