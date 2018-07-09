@@ -3,6 +3,7 @@ from core.models import Echo, Profile, Token
 from django.contrib.auth.models import User
 from django.contrib.auth.hashers import PBKDF2SHA1PasswordHasher
 from django.conf import settings
+from rest_framework.validators import UniqueValidator
 
 SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
@@ -10,7 +11,7 @@ SALT = getattr(settings, "PASSWORD_SALT", "salt")
 class UserSerializer(serializers.ModelSerializer):
     echos = serializers.PrimaryKeyRelatedField(many=True, queryset=Echo.objects.all())
     first_name = serializers.CharField()
-    email = serializers.CharField()
+    email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())])
     password = serializers.CharField()
     is_active = serializers.BooleanField(default=True)
     picture = serializers.FileField(source="profile.picture")
