@@ -12,6 +12,7 @@ from rest_framework.permissions import AllowAny, IsAdminUser
 from django.contrib.auth.hashers import PBKDF2SHA1PasswordHasher
 from django.conf import settings
 from rest_framework.authtoken.models import Token
+from rest_framework.renderers import JSONRenderer
 
 SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
@@ -152,24 +153,39 @@ class Login(APIView):
     """
 
     permission_classes = (AllowAny,)
+    renderer_classes = (JSONRenderer, )
 
     def post(self, request, format=None):
         username = self.request.POST.get('username', None)
         email = self.request.POST.get('email', None)
         password = self.request.POST.get('password', None)
+        data = {}
         if not all([username, email, password]):
-            return Response("You have to supply 'username', 'email' and 'password' parameters.", status=status.HTTP_400_BAD_REQUEST)
+            data['detail'] = "You have to supply 'username', 'email' and 'password' parameters."
+            return Response(data, status=status.HTTP_400_BAD_REQUEST)
         try:
             user = User.objects.get(username=username, password=PBKDF2SHA1PasswordHasher().encode(password, SALT))
         except User.DoesNotExist:
             try:
                 user = User.objects.get(email=email, password=PBKDF2SHA1PasswordHasher().encode(password, SALT))
             except User.DoesNotExist:
-                return Response("Login failed because of wrong user credentials.", status=status.HTTP_401_UNAUTHORIZED)
+                try:
+                    user = User.objects.get(username=username)
+                    data['password'] = "Wrong password."
+                    return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+                except User.DoesNotExist:
+                    try:
+                        user = User.objects.get(email=email)
+                        data['password'] = "Wrong password."
+                        return Response(data, status=status.HTTP_401_UNAUTHORIZED)
+                    except User.DoesNotExist:
+                        data['username'] = "Username or email not found."
+                        return Response(data, status=status.HTTP_401_UNAUTHORIZED)
         if user:
             serializer = UserSerializer(user)
             return Response(serializer.data)
-        return Response("Unknown internal server error.", status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        data['detail'] = "Unknown internal server error."
+        return Response(data, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class UserDetail(APIView):
