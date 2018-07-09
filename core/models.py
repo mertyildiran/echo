@@ -7,6 +7,7 @@ import uuid
 from django.contrib.gis.db import models as geo_models
 from rest_framework.authtoken.models import Token
 from django.conf import settings
+from datetime import date
 
 
 def echo_directory(instance, filename):
@@ -55,6 +56,12 @@ class Profile(models.Model):
     instagram = models.CharField(max_length=30, null=True, blank=True)
     twitter = models.CharField(max_length=30, null=True, blank=True)
     snapchat = models.CharField(max_length=30, null=True, blank=True)
+
+    @property
+    def age(self):
+        born = self.birth_date
+        today = date.today()
+        return today.year - born.year - ((today.month, today.day) < (born.month, born.day))
 
 
 class Notification(models.Model):
