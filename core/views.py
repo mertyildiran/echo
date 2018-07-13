@@ -53,7 +53,7 @@ class EchoList(APIView):
 
     def post(self, request, format=None):
         try:
-            if not Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id == self.request.POST.get('owner', None):
+            if not Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id == int(self.request.POST.get('owner', None)):
                 return Response("You cannot send echos in the name of a different user.", status=status.HTTP_403_FORBIDDEN)
         except User.DoesNotExist:
             return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
