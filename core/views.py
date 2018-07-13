@@ -267,22 +267,22 @@ class NotificationList(APIView):
 
 
 def analyze_sexual_pref(gender, sexual_pref):
-    if sexual_pref == 'Heterosexual':
-        if gender == 'Male':
+    if sexual_pref in ['A', 'Heterosexual']:
+        if gender in ['M', 'Male']:
             return ['Female'], ['Heterosexual', 'Bisexual']
-        elif gender == 'Female':
+        elif gender in ['F', 'Female']:
             return ['Male'], ['Heterosexual', 'Bisexual']
-    elif sexual_pref == "Bisexual":
+    elif sexual_pref in ['B', 'Bisexual']:
         return ['Male', 'Female'], ['Heterosexual', 'Bisexual', 'Homosexual']
-    elif sexual_pref == 'Homosexual':
-        if gender == 'Male':
+    elif sexual_pref in ['C', 'Homosexual']:
+        if gender in ['M', 'Male']:
             return ['Male'], ['Homosexual', 'Bisexual']
-        elif gender == 'Female':
+        elif gender in ['F', 'Female']:
             return ['Female'], ['Homosexual', 'Bisexual']
-    elif sexual_pref == 'Sapiosexual':
-        if gender == 'Male':
+    elif sexual_pref in ['D', 'Sapiosexual']:
+        if gender in ['M', 'Male']:
             return ['Female'], ['Sapiosexual']
-        elif gender == 'Female':
+        elif gender in ['F', 'Female']:
             return ['Male'], ['Sapiosexual']
     return ['Female'], ['Heterosexual', 'Bisexual']
 
