@@ -25,6 +25,8 @@ class UserSerializer(serializers.ModelSerializer):
     twitter = serializers.CharField(source="profile.twitter", required=False)
     snapchat = serializers.CharField(source="profile.snapchat", required=False)
 
+    hearts = serializers.IntegerField(source="profile.hearts", required=False, read_only=True)
+
     age = serializers.ReadOnlyField(source="profile.age")
 
     key = serializers.CharField(source="auth_token.key", required=False, read_only=True)
@@ -35,7 +37,7 @@ class UserSerializer(serializers.ModelSerializer):
                     'groups', 'user_permissions', 'is_staff', 'is_active',
                     'is_superuser', 'last_login', 'date_joined', 'picture',
                     'birth_date', 'gender', 'echos', 'sexual_pref', 'bio',
-                    'instagram', 'twitter', 'snapchat', 'age', 'key')
+                    'instagram', 'twitter', 'snapchat', 'hearts', 'age', 'key')
 
     def create(self, validated_data):
         profile_data = validated_data.pop('profile', None)
@@ -62,7 +64,7 @@ class EchoSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Echo
-        fields = ('id', 'created_at', 'owner', 'owner_id', 'audio', 'location', 'distance', 'hearts', 'is_active')
+        fields = ('id', 'created_at', 'owner', 'owner_id', 'audio', 'location', 'distance', 'is_active')
 
 
 class NotificationSerializer(serializers.ModelSerializer):

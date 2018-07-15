@@ -28,7 +28,6 @@ class Echo(models.Model):
     owner = models.ForeignKey(User, related_name='echos', on_delete=models.CASCADE)
     audio = models.FileField(null=False, blank=False, upload_to=echo_directory)
     location = geo_models.PointField(null=False, blank=False, srid=4326, verbose_name="Location")
-    hearts = models.PositiveIntegerField(default=0)
     is_active = models.BooleanField(default=True)
 
     class Meta:
@@ -56,6 +55,8 @@ class Profile(models.Model):
     instagram = models.CharField(max_length=30, null=True, blank=True)
     twitter = models.CharField(max_length=30, null=True, blank=True)
     snapchat = models.CharField(max_length=30, null=True, blank=True)
+
+    hearts = models.PositiveIntegerField(default=0)
 
     @property
     def age(self):
