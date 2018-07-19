@@ -10,7 +10,7 @@ SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
 
 class UserSerializer(serializers.ModelSerializer):
-    echos = serializers.PrimaryKeyRelatedField(many=True, queryset=Echo.objects.all())
+    echoes = serializers.PrimaryKeyRelatedField(many=True, queryset=Echo.objects.all())
     first_name = serializers.CharField()
     email = serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all())])
     password = serializers.CharField()
@@ -36,7 +36,7 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ('id', 'username', 'first_name', 'last_name', 'email', 'password',
                     'groups', 'user_permissions', 'is_staff', 'is_active',
                     'is_superuser', 'last_login', 'date_joined', 'picture',
-                    'birth_date', 'gender', 'echos', 'sexual_pref', 'bio',
+                    'birth_date', 'gender', 'echoes', 'sexual_pref', 'bio',
                     'instagram', 'twitter', 'snapchat', 'hearts', 'age', 'key')
 
     def create(self, validated_data):

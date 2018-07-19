@@ -20,7 +20,7 @@ SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
 class EchoList(APIView):
     """
-    List echos by filter, or create a new echo.
+    List echoes by filter, or create a new echo.
     """
 
     renderer_classes = (DistanceRenderer,)
@@ -39,22 +39,22 @@ class EchoList(APIView):
         target_gender, target_sexual_pref = analyze_sexual_pref(gender, sexual_pref)
         target_gender, target_sexual_pref = shorten(target_gender, target_sexual_pref)
         if all([latitude, longitude, distance, gender, sexual_pref]):
-            echos = Echo.objects.filter(location__distance_lte=(ref_location, D(m=distance)),
+            echoes = Echo.objects.filter(location__distance_lte=(ref_location, D(m=distance)),
                                         owner__profile__gender__in=target_gender,
                                         owner__profile__sexual_pref__in=target_sexual_pref,
                                         is_active=True).annotate(distance=Distance('location', ref_location)).order_by('distance')
         elif only_active:
-            echos = Echo.objects.filter(is_active=True).order_by('created_at')
+            echoes = Echo.objects.filter(is_active=True).order_by('created_at')
         else:
-            echos = []
+            echoes = []
 
-        serializer = EchoSerializer(echos, many=True)
+        serializer = EchoSerializer(echoes, many=True)
         return Response(serializer.data)
 
     def post(self, request, format=None):
         try:
             if not Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id == int(self.request.POST.get('owner_id', None)):
-                return Response("You cannot send echos in the name of a different user.", status=status.HTTP_403_FORBIDDEN)
+                return Response("You cannot send echoes in the name of a different user.", status=status.HTTP_403_FORBIDDEN)
         except User.DoesNotExist:
             return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
         serializer = EchoSerializer(data=request.data)
@@ -69,14 +69,14 @@ class EchoList(APIView):
 
 class StaffOnlyEchoList(APIView):
     """
-    List all echos, or create a new echo.
+    List all echoes, or create a new echo.
     """
 
     permission_classes = (IsAdminUser,)
 
     def get(self, request, format=None):
-        echos = Echo.objects.all().order_by('created_at')
-        serializer = EchoSerializer(echos, many=True)
+        echoes = Echo.objects.all().order_by('created_at')
+        serializer = EchoSerializer(echoes, many=True)
         return Response(serializer.data)
 
 
@@ -117,7 +117,7 @@ class EchoDetail(APIView):
     def delete(self, request, pk, format=None):
         echo = self.get_object(pk)
         if not self.check_owner(request, echo):
-            return Response("You cannot delete echos that are belong to other users.", status=status.HTTP_403_FORBIDDEN)
+            return Response("You cannot delete echoes that are belong to other users.", status=status.HTTP_403_FORBIDDEN)
         echo.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 

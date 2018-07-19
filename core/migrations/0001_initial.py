@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('longitude', models.IntegerField()),
                 ('hearts', models.IntegerField(default=0)),
                 ('is_active', models.BooleanField(default=True)),
-                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='echos', to=settings.AUTH_USER_MODEL)),
+                ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='echoes', to=settings.AUTH_USER_MODEL)),
             ],
             options={
                 'ordering': ('created_at',),

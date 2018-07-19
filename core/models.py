@@ -25,7 +25,7 @@ def profile_directory(instance, filename):
 
 class Echo(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
-    owner = models.ForeignKey(User, related_name='echos', on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, related_name='echoes', on_delete=models.CASCADE)
     audio = models.FileField(null=False, blank=False, upload_to=echo_directory)
     location = geo_models.PointField(null=False, blank=False, srid=4326, verbose_name="Location")
     is_active = models.BooleanField(default=True)
