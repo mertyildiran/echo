@@ -265,6 +265,23 @@ class NotificationList(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+class Like(APIView):
+    """
+    Called when a profile card liked (giving heart)
+    """
+
+    def get_object(self, pk):
+        try:
+            return User.objects.get(pk=pk)
+        except User.DoesNotExist:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+
+    def patch(self, request, pk, format=None):
+        user = self.get_object(pk)
+        user.profile.hearts += 1
+        user.save()
+        return Response(status=status.HTTP_200_OK)
+
 
 def analyze_sexual_pref(gender, sexual_pref):
     if sexual_pref in ['A', 'Heterosexual']:

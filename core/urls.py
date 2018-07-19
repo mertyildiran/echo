@@ -12,5 +12,6 @@ urlpatterns = [
     url(r'^register/$', views.Register.as_view()),
     url(r'^login/$', views.Login.as_view()),
     url(r'^notifications/$', views.NotificationList.as_view()),
+    url(r'^like/(?P<pk>[0-9]+)/$', views.Like.as_view()),
 ]
 urlpatterns = format_suffix_patterns(urlpatterns)
