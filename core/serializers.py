@@ -70,4 +70,4 @@ class EchoSerializer(serializers.ModelSerializer):
 class NotificationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Notification
-        fields = ('id', 'created_at', 'sender', 'receiver')
+        fields = ('id', 'created_at', 'sender', 'receiver', 'unread')

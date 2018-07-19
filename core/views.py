@@ -249,6 +249,9 @@ class NotificationList(APIView):
     def get(self, request, format=None):
         try:
             notifications = Notification.objects.filter(sender=Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id).order_by('-created_at')
+            for notification in notifications:
+                notification.unread = False
+                notification.save()
         except User.DoesNotExist:
             return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
         serializer = NotificationSerializer(notifications, many=True)
