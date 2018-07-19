@@ -280,6 +280,8 @@ class Like(APIView):
         user = self.get_object(pk)
         user.profile.hearts += 1
         user.save()
+        notification = Notification(sender=Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user, receiver=user)
+        notification.save()
         return Response(status=status.HTTP_200_OK)
 
 
