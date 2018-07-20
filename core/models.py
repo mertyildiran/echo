@@ -29,6 +29,7 @@ class Echo(models.Model):
     audio = models.FileField(null=False, blank=False, upload_to=echo_directory)
     location = geo_models.PointField(null=False, blank=False, srid=4326, verbose_name="Location")
     is_active = models.BooleanField(default=True)
+    always_active = models.BooleanField(default=False)
 
     class Meta:
         ordering = ('created_at',)
