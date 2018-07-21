@@ -27,7 +27,7 @@ def setup_periodic_tasks(sender, **kwargs):
 def garbage_collector():
     time_ago = datetime.datetime.now() - datetime.timedelta(minutes=LIFE_SPAN)
 
-    echoes = Echo.objects.filter(created_at__lte=time_ago, is_active=True).order_by('created_at')
+    echoes = Echo.objects.filter(created_at__lte=time_ago, is_active=True, always_active=False).order_by('created_at')
     for echo in echoes:
         if echo.audio and hasattr(echo.audio, 'path'):
             print(echo.audio.path)
