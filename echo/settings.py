@@ -158,3 +158,4 @@ elif PLATFORM_SYSTEM == "Linux":
     SPATIALITE_LIBRARY_PATH = 'mod_spatialite'
 
 PASSWORD_SALT = "0cdAT1bdqZ"
+REGISTRATION_KEY = "wBhBpSXKlwMfVRtm6zWExpWwjBbsL41W"

@@ -143,6 +143,8 @@ class Register(APIView):
     permission_classes = (AllowAny,)
 
     def post(self, request, format=None):
+        if not self.request.POST.get('registration_key', None) == getattr(settings, "REGISTRATION_KEY"):
+            return Response("Update your application.", status=status.HTTP_401_UNAUTHORIZED)
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
