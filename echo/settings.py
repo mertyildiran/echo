@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'core.apps.CoreConfig',
     'rest_framework.authtoken',
     'rest_framework_gis',
-    'django.contrib.gis'
+    'django.contrib.gis',
+    'mapwidgets'
 ]
 
 MIDDLEWARE = [
@@ -159,3 +160,11 @@ elif PLATFORM_SYSTEM == "Linux":
 
 PASSWORD_SALT = "0cdAT1bdqZ"
 REGISTRATION_KEY = "wBhBpSXKlwMfVRtm6zWExpWwjBbsL41W"
+
+MAP_WIDGETS = {
+    "GooglePointFieldWidget": (
+        ("zoom", 8),
+        ("markerFitZoom", 4),
+    ),
+    "GOOGLE_MAP_API_KEY": "<google-api-key>"
+}

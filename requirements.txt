@@ -3,3 +3,4 @@ djangorestframework==3.8.2
 celery==4.2.0
 redis==2.10.6
 djangorestframework-gis==0.13
+django-map-widgets==0.1.9
