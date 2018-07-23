@@ -61,6 +61,8 @@ class EchoSerializer(serializers.ModelSerializer):
     owner = UserSerializer(many=False, read_only=True)
     owner_id = serializers.PrimaryKeyRelatedField(queryset=User.objects.all(), source='owner', write_only=True)
     distance = serializers.ReadOnlyField()
+    is_active = serializers.ReadOnlyField()
+    always_active = serializers.ReadOnlyField()
 
     class Meta:
         model = Echo
