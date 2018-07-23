@@ -14,6 +14,8 @@ from django.conf import settings
 from rest_framework.authtoken.models import Token
 from rest_framework.renderers import JSONRenderer
 from core.renderers import DistanceRenderer
+import os
+import random
 
 SALT = getattr(settings, "PASSWORD_SALT", "salt")
 
@@ -47,6 +49,10 @@ class EchoList(APIView):
             echoes = Echo.objects.filter(is_active=True).order_by('created_at')
         else:
             echoes = []
+
+        if sexual_pref in ['D', 'Sapiosexual']:
+            for echo in echoes:
+                echo.owner.profile.picture = "/helicopters/" + random.choice(os.listdir("./media/helicopters/"))
 
         serializer = EchoSerializer(echoes, many=True)
         return Response(serializer.data)
@@ -305,9 +311,9 @@ def analyze_sexual_pref(gender, sexual_pref):
             return ['Female'], ['Homosexual', 'Bisexual']
     elif sexual_pref in ['D', 'Sapiosexual']:
         if gender in ['M', 'Male']:
-            return ['Female'], ['Sapiosexual']
+            return ['Female'], ['Heterosexual', 'Sapiosexual']
         elif gender in ['F', 'Female']:
-            return ['Male'], ['Sapiosexual']
+            return ['Male'], ['Heterosexual', 'Sapiosexual']
     return ['Female'], ['Heterosexual', 'Bisexual']
 
 def shorten(target_gender, target_sexual_pref):
