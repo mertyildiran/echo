@@ -12,9 +12,9 @@ class EchoAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.PointField: {"widget": GooglePointFieldWidget}
     }
-    fields = ('owner', 'audio', 'location', 'is_active', 'always_active')
+    fields = ('created_at', 'owner', 'audio', 'location', 'is_active', 'always_active')
 admin.site.register(Echo, EchoAdmin)
 
 class NotificationAdmin(admin.ModelAdmin):
-    fields = ('sender', 'receiver')
+    fields = ('created_at', 'sender', 'receiver', 'unread')
 admin.site.register(Notification, NotificationAdmin)

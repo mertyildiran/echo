@@ -256,7 +256,7 @@ class NotificationList(APIView):
 
     def get(self, request, format=None):
         try:
-            notifications = Notification.objects.filter(receiver=Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id).order_by('-created_at')
+            notifications = Notification.objects.filter(receiver=Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id, unread=True).order_by('-created_at')
             for notification in notifications:
                 notification.unread = False
                 notification.save()
