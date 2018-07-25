@@ -23,6 +23,8 @@ sudo ./install.sh
 pip3 install -r requirements.txt
 ```
 
+or with Docker: `docker pull mertyildiran/echo`
+
 ### Usage
 
 This script will start a Redis Server, the Django RESTful API and Celery Periodic Tasks:
@@ -31,3 +33,5 @@ This script will start a Redis Server, the Django RESTful API and Celery Periodi
 python3 manage.py migrate
 ./run.sh
 ```
+
+or with Docker: `docker-compose up`
