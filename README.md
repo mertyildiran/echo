@@ -3,14 +3,23 @@
 the RESTful API of echo: voice-focused dating app, written on top of Django REST framework
 
 <p align="center">
-  <img src="https://i.imgur.com/BXRSW6g.png" alt="App icon" height="300px"/>
+  <img src="https://i.imgur.com/BXRSW6g.png" alt="App icon" height="200px"/>
 </p>
+
+<p align="center">
+  <img src="https://i.imgur.com/AEDbGtg.jpg" alt="Feature graphic" height="200px"/>
+</p>
+
+#### Android Client
+
+<a href="https://play.google.com/store/apps/details?id=computer.dragon.echo&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1"><img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" height="100px" /></a>
 
 ### Installation
 
-We assume that you have Python 3.6.5, pip, Redis, GDAL library and libspatialite (or PostGIS) installed on your environment. If these requirements are satisfied then run:
+Make sure your Python version is 3.6.5 and pip3 installed on your system. To install Redis, GDAL library, libspatialite (or PostGIS) and the other dependencies run:
 
 ```Shell
+sudo ./install.sh
 pip3 install -r requirements.txt
 ```
 
