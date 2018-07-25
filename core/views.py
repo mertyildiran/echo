@@ -46,7 +46,7 @@ class EchoList(APIView):
                                         owner__profile__sexual_pref__in=target_sexual_pref,
                                         is_active=True).annotate(distance=Distance('location', ref_location)).order_by('distance')
         elif only_active:
-            echoes = Echo.objects.filter(is_active=True).order_by('created_at')
+            echoes = Echo.objects.filter(is_active=True).order_by('-created_at')
         else:
             echoes = []
 
@@ -266,7 +266,7 @@ class NotificationList(APIView):
 
     def get(self, request, format=None):
         try:
-            notifications = Notification.objects.filter(receiver=Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id, unread=True).order_by('-created_at')
+            notifications = Notification.objects.filter(receiver=Token.objects.get(key=self.request.META['HTTP_AUTHORIZATION'].split(' ', 1)[1]).user.id, unread=True).order_by('created_at')
             for notification in notifications:
                 notification.unread = False
                 notification.save()
