@@ -1,0 +1,43 @@
+version: '2'  
+services:  
+  web:
+    build: .
+    container_name: echo
+    command: python manage.py runserver 0.0.0.0:80
+
+    links:
+      - redis
+    depends_on:
+      - migration
+    volumes:
+      - ./db.sqlite3:/db.sqlite3
+    expose:
+      - "80"
+    ports:
+      - 80:80
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+     - '6379:6379'
+
+  celery:
+    build: .
+    container_name: celery
+    command: >
+        bash -c "celery -A echo worker -l info
+        && celery -A echo beat -l info"
+    links:
+      - redis
+    environment:
+      - CELERY_BROKER_URL=redis://redis/0
+      - CELERY_BACKEND_URL=redis://redis/0
+
+  migration:
+    build: .
+    image: echo
+    command: python3 manage.py migrate
+
+volumes:
+  db.sqlite3:
