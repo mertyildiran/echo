@@ -63,7 +63,17 @@ class EchoList(APIView):
                 return Response("You cannot send echoes in the name of a different user.", status=status.HTTP_403_FORBIDDEN)
         except User.DoesNotExist:
             return Response("Your API key is wrong or your records are corrupted.", status=status.HTTP_401_UNAUTHORIZED)
-        serializer = EchoSerializer(data=request.data)
+        try:
+            echo = Echo.objects.get(owner=int(self.request.POST.get('owner_id', None)), is_active=True)
+            if echo.audio and hasattr(echo.audio, 'path'):
+                print(echo.audio.path)
+                try:
+                    os.remove(echo.audio.path)
+                except OSError:
+                    pass
+            serializer = EchoSerializer(echo, data=request.data)
+        except Echo.DoesNotExist:
+            serializer = EchoSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
