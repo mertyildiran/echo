@@ -7,7 +7,7 @@ the RESTful API of echo: voice-focused dating app, written on top of Django REST
 </p>
 
 <p align="center">
-  <img src="https://i.imgur.com/AEDbGtg.jpg" alt="Feature graphic" height="200px"/>
+  <img src="https://i.imgur.com/mdCa8I2.jpg" alt="Feature graphic" height="300px"/>
 </p>
 
 #### Android Client
