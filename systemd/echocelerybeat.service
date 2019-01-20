@@ -1,0 +1,15 @@
+[Unit]
+Description=echo App API Celery Beat
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=echo
+WorkingDirectory=/home/echo/echo
+ExecStart=/home/echo/.local/bin/celery -A echo beat -l info
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,14 @@
+[Unit]
+Description=echo App API Service
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=echo
+ExecStart=/usr/bin/python3 /home/echo/echo/manage.py runserver 0.0.0.0:4048
+
+[Install]
+WantedBy=multi-user.target

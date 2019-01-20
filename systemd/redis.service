@@ -1,0 +1,14 @@
+[Unit]
+Description=Redis Server
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=echo
+ExecStart=/usr/local/bin/redis-server
+
+[Install]
+WantedBy=multi-user.target
