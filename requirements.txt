@@ -1,4 +1,4 @@
-django==2.0.6
+django==2.0.10
 djangorestframework==3.8.2
 celery==4.2.0
 redis==2.10.6
